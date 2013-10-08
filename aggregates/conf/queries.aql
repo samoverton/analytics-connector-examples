@@ -1,0 +1,7 @@
+#
+# Some example queries
+#
+
+select USERDEFINED('com.acunu.analytics.example.ExponentialMovingAverage', 't', 'val', '0.1') from tbl;
+
+

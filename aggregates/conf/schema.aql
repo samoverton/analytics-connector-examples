@@ -1,0 +1,16 @@
+# load this with summer:
+# summer < schema.aql
+#
+
+drop table if exists tbl;
+create table tbl (
+   t    time,
+   name string,
+   val  long
+);
+
+create cube select count from tbl where name;
+create cube select USERDEFINED('com.acunu.analytics.example.ExponentialMovingAverage', 't', 'val', '0.1') from tbl;
+
+
+

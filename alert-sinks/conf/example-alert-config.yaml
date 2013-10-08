@@ -1,0 +1,22 @@
+#
+# Configure alerts here.
+#
+# - This file in in YAML http://www.yaml.org.  Indentation is important.
+# - ${foo} is for variable substitution; $[foo] does URL encoding.
+# - start_timestamp and end_timestamp are always defined per alert
+#   as the time range over which we check.  prev_timestamp is the previous start time.
+# - remember to enclose string literals in ' quotes even variables: "where foo='${bar}'".
+#
+
+sinks:
+  file_example:
+    classname: com.acunu.analytics.alerts.FileAlertSink
+
+global:
+  frequency_seconds: 10
+  sink: file_example
+
+alerts:
+  - name: "File test"
+    query: "select eventcount from t"
+    body: "Hello World"
