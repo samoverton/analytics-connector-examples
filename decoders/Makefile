@@ -31,7 +31,7 @@ install-jar: jar
 	mkdir -p $(CONNECTOR_DIR)
 	mkdir -p $(CONNECTOR_LIB_DIR)
 	cp build/$(CONNECTOR_NAME).jar $(CONNECTOR_DIR)/
-	cp -r lib/* $(CONNECTOR_LIB_DIR)
+	if [ -d lib/ ]; then cp -r lib/* $(CONNECTOR_LIB_DIR); fi
 
 .PHONY: build
 build:

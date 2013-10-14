@@ -16,7 +16,7 @@ import com.acunu.analytics.ingest.DecodeException;
  * Tests for the {@link RegexDecoder} example.
  * 
  * @author tmoreton
- *
+ * 
  */
 public class RegexDecoderTest {
 
@@ -41,6 +41,21 @@ public class RegexDecoderTest {
 		Assert.assertEquals("0", e.get("duration"));
 		Assert.assertEquals("TCP_HIT", e.get("cache_code"));
 		Assert.assertEquals("application/json", e.get("content_type"));
+	}
+
+	@Test
+	public void testSimple() throws DecodeException {
+		final Map<String, Object> props = new HashMap<String, Object>();
+		props.put("fields", "msg");
+		props.put("regex", "(\\S+)");
+		RegexDecoder d = new RegexDecoder(new SimpleConfig(props));
+
+		List<Event> l = d.decode("hello");
+		Assert.assertEquals(1, l.size());
+		Event e = l.get(0);
+		Assert.assertEquals(1, e.size());
+
+		Assert.assertEquals("hello", e.get("msg"));
 	}
 
 }

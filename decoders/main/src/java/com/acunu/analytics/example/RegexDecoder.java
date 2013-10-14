@@ -103,9 +103,9 @@ public class RegexDecoder extends AbstractDecoder {
 		// the whole match). You can skip a group with an empty name.
 
 		final Event e = new Event();
-		for (int i = 1; i <= m.groupCount() && i < this.groupNames.length; i++)
-			if (!"".equals(this.groupNames[i - 1]))
-				e.put(this.groupNames[i - 1], m.group(i));
+		for (int i = 0; i < m.groupCount() && i < this.groupNames.length; i++)
+			if (!"".equals(this.groupNames[i]))
+				e.put(this.groupNames[i], m.group(i + 1));
 
 		return Collections.singletonList(e);
 	}
