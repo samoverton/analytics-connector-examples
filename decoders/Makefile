@@ -33,11 +33,14 @@ install-jar: jar
 	cp build/$(CONNECTOR_NAME).jar $(CONNECTOR_DIR)/
 	cp -r lib/* $(CONNECTOR_LIB_DIR)
 
+.PHONY: build
 build:
 	ant build
 
+.PHONY: test
 test:
 	ant test
 
+.PHONY: clean
 clean:
 	ant clean

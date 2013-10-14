@@ -22,6 +22,10 @@
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
     
+	<property name="build" location="build" />
+	<property name="main-classes" location="${build}/classes/main" />
+	<property name="test-classes" location="${build}/classes/test" />
+	
     <path id="Acunu Example.classpath">
 		<pathelement location="build"/>
 		<fileset dir="lib" erroronmissingdir="false">
@@ -33,17 +37,14 @@
     </path>
     
 	<target name="jar" depends="build" description="Create Jar file">
-		<jar jarfile="build/acunu-connector-examples-decoders.jar" basedir="build" includes="**/*.class" />
+		<jar jarfile="build/acunu-connector-examples-decoders.jar" basedir="${main-classes}" includes="**/*.class" />
 	</target>
 	
     <target name="init">
         <mkdir dir="build"/>
-        <copy includeemptydirs="false" todir="build">
-            <fileset dir="main/src/java">
-                <exclude name="**/*.launch"/>
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
+		<mkdir dir="${build}/classes" />
+		<mkdir dir="${build}/classes/main" />
+		<mkdir dir="${build}/classes/test" />
     </target>
     
     <target name="clean">
@@ -57,10 +58,40 @@
     
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="build" source="${source}" target="${target}">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${main-classes}" source="${source}" target="${target}">
             <src path="main/src/java"/>
             <classpath refid="Acunu Example.classpath"/>
         </javac>
     </target>
+	
+    <target depends="build-project" name="build-tests">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${test-classes}" source="${source}" target="${target}">
+            <src path="test/src/java"/>
+			<classpath>
+				<path refid="Acunu Example.classpath"/>
+				<pathelement path="${main-classes}" />
+			</classpath>
+        </javac>
+    </target>
+
+	<target name="test" depends="build-tests">
+        <mkdir dir="${build}/junit"/>
+		<junit printsummary="yes" fork="yes" forkmode="once" haltonfailure="yes">
+			<jvmarg value="-enableassertions" />
+            <!--jvmarg value="-Xdebug" /-->
+            <!--jvmarg value="-Xrunjdwp:server=y,suspend=y,transport=dt_socket,address=3333" /-->
+			<formatter type="xml" />
+			<!--formatter type="plain" usefile="false"/-->
+			<classpath>
+				<path refid="Acunu Example.classpath"/>
+				<pathelement path="${main-classes}" />
+				<pathelement path="${test-classes}"/>
+			</classpath>
+			<batchtest todir="${build}/junit">
+				<fileset dir="${test-classes}" includes="**/${test}.class" />
+			</batchtest>
+		</junit>
+	</target>
 
 </project>
