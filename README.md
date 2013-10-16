@@ -11,13 +11,13 @@ This repository contains some example connectors to make it easy to get started
 Note that the APIs are 'beta' in Analytics v5.0: they may change as we expand
  the range of connectors available and in response to feedback from users. 
 
-There are several different types of connector. This repo contains the following
+There are several different types of connectors. This repo contains the following
  examples, in the matching sub-directories:
 
 * `aggregates`: An exponential moving average aggregate
 * `alert-sinks`: An alert sink that records alerts in a file
-* `decoders`: XXX
-* `ingesters`: XXX
+* `decoders`: A regex decoder that splits a string into pre-defined fields
+* `ingesters`: An ingester that runs a command and ingests its output
 * `preprocessors`: A preprocessor that flattens complex JSON objects
 
 We welcome questions, suggestions, feedback, patches and problems reports. 
@@ -127,16 +127,28 @@ Then create an ingester:
 
 Create a table with the following format:
 
-    CREATE INGESTER my_ingester USING 'com.acunu.analytics.example.ExecIngester';
+    CREATE TABLE cassandra_logs
+       (timestamp TIME(DAY,HOUR,MIN,SEC),
+        level     ENUM(DEBUG,ERROR,FATAL,INFO,TRACE,WARN),
+        pool      STRING,
+        file      STRING,
+        line      LONG,
+        message   STRING);
 
-Then create a flow that runs a command, in this example the Acunu Analytics log: 
 
-    CREATE FLOW my_flow INGESTER my_ingester DECODER 'com.acunu.analytics.example.RegexDecoder' 
-      RECEIVER my_table PROPERTIES regex = '', 
-      fields = ' ';
+Then an exec ingester:
 
-In this somewhat circular setup, events should appear in the table every time an 
-ingester records in the log file how many events it has processed.
+    CREATE INGESTER exec_ingester USING 'com.acunu.analytics.example.ExecIngester';
+
+Then create a flow that runs a command, in this example the Acunu Analytics log:
+
+    CREATE FLOW cassandra_flow INGESTER exec_ingester DECODER 'com.acunu.analytics.example.RegexDecoder'
+      RECEIVER cassandra_logs PROPERTIES command = 'tail -F /var/log/cassandra/system.log',
+        regex = '^ ([A-Z]+) .([A-Za-z]+)[^ ]+ ([^,]+),[^ ]+ ([A-Za-z]+.java)..line ([0-9]+)..(.*)',
+        fields = 'level,pool,timestamp,file,line,message';
+
+In this setup, events should appear in the table every time a line is added to
+the Cassandra log file.
 
 
 ** JSON Flattening Preprocessor **

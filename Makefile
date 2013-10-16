@@ -1,5 +1,6 @@
-
 SUBDIRS=aggregates alert-sinks decoders ingesters preprocessors
+
+all: build
 
 # For these targets, automatically recurse into "SUBDIR" sub-directories
 RECUR=clean test install build
