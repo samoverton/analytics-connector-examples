@@ -108,19 +108,36 @@ See the [Acunu alerts documentation](http://www.acunu.com//documentation.html#%2
 for more details.
 
 
-** XXX Ingester and Regex Decoder **
+** Exec Ingester and Regex Decoder **
 
-This decoder accepts unstructured text and allows you to specify a regular 
+The exec ingester shows how to construct an ingester than supports multiple flows. 
+For every flow, it execs a process using a command line specified as a property of 
+the flow, and ingests each line of that process' stdout as an event.  
+
+The regex decoder accepts unstructured text and allows you to specify a regular 
 expression to extract portions of the text and name them to create a 'map-like' 
-event that Acunu Analytics can process.
+event that Acunu Analytics can process. Note that in version 5.0, decoders cannot 
+be used via the HTTP API. Instead, you need to set up an ingester and a flow, and 
+specify the decoder there.
 
-In version 5.0, decoders cannot be used via the HTTP API. Instead, you need to 
-set up an ingester and a flow, and specify the decoder there.
+To test the exec ingester and regex decoder together, build and install both and
+restart the Analytics server.
 
-For example:
+Then create an ingester:
+
+Create a table with the following format:
+
+    CREATE INGESTER my_ingester USING 'com.acunu.analytics.example.ExecIngester';
+
+Then create a flow that runs a command, in this example the Acunu Analytics log: 
 
     CREATE FLOW my_flow INGESTER my_ingester DECODER 'com.acunu.analytics.example.RegexDecoder' 
-      RECEIVER my_table PROPERTIES regex = '<regex>', fields = '<comma-separated-group-names>';
+      RECEIVER my_table PROPERTIES regex = '', 
+      fields = ' ';
+
+In this somewhat circular setup, events should appear in the table every time an 
+ingester records in the log file how many events it has processed.
+
 
 ** JSON Flattening Preprocessor **
 
