@@ -140,7 +140,7 @@ Then an exec ingester:
 
     CREATE INGESTER exec_ingester USING 'com.acunu.analytics.example.ExecIngester';
 
-Then create a flow that runs a command, in this example the Acunu Analytics log:
+Then create a flow that runs a command, in this example tailing the Cassandra log:
 
     CREATE FLOW cassandra_flow INGESTER exec_ingester DECODER 'com.acunu.analytics.example.RegexDecoder'
       RECEIVER cassandra_logs PROPERTIES command = 'tail -F /var/log/cassandra/system.log',
